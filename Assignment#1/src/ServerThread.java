@@ -9,12 +9,9 @@ import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-
 public class ServerThread extends Thread {
 
-	private static final int PORT = 4444;
-	
-	Socket clientSocket;
+	private Socket clientSocket;
 
 	public ServerThread(Socket cs) {
 		this.clientSocket = cs;
@@ -26,25 +23,19 @@ public class ServerThread extends Thread {
 				+ ": Worker thread starting");
 		try {
 
-				PrintStream ps = new PrintStream(clientSocket.getOutputStream());
-				BufferedReader r = new BufferedReader(new InputStreamReader(
-						clientSocket.getInputStream()));
-				String line;
-				
-				//This code was added to simply make the server take longer
-				//for each request. Without it, the overhead cost of 
-				//spawning threads overshadowed the benifits, because the
-				//server could handle requests faster than the client could
-				//make them.
-				for(int i=0;i<10000000;i++);
-				while ((line = r.readLine()) != null) {
-					System.out.println("Received: " + line);
-					ps.println(line.toUpperCase());
-				}
-				System.out.println("Client disconnected");
-				ps.close();
-				r.close();
-			
+			PrintStream ps = new PrintStream(clientSocket.getOutputStream());
+			BufferedReader r = new BufferedReader(new InputStreamReader(
+					clientSocket.getInputStream()));
+			String line;
+
+			while ((line = r.readLine()) != null) {
+				System.out.println("Received: " + line);
+				ps.println(line.toUpperCase());
+			}
+			System.out.println("Client disconnected");
+			ps.close();
+			r.close();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

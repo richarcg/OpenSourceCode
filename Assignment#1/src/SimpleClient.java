@@ -10,10 +10,11 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class SimpleClient {
-	
+
 	private static final int PORT = 4444;
 
-	public static void main(String[] args) throws UnknownHostException, IOException {
+	public static void main(String[] args) throws UnknownHostException,
+			IOException {
 		Socket s = new Socket("localhost", PORT);
 		System.out.println("Client is connected to the server");
 		PrintStream ps = new PrintStream(s.getOutputStream());

@@ -9,62 +9,41 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-
 public class BenchmarkClient {
 
 	private static final int PORT = 4444;
-	private static int SAMPLE_SIZE = 100;
+	private static final int SAMPLE_SIZE = 1000;
+	private static final int THREAD_COUNT = 3;
 
-	
-	public static void main(String[] args) throws UnknownHostException, IOException {
-		
-		long longDelay=0;
-		long shortDelay=0;
-		long averageDelay=0;
-		long timeBefore, timeAfter, timeTaken;
-		for(int i=0; i<SAMPLE_SIZE; i++)
-		{
-			timeBefore = System.nanoTime();
-			Socket s = new Socket("localhost", PORT);
+	private static ClientThread[] ctArray;
 
-			System.out.println("Client is connected to the server");
-			PrintStream ps = new PrintStream(s.getOutputStream());
-			BufferedReader r = new BufferedReader(new InputStreamReader(
-					s.getInputStream()));
+	public static void main(String[] args) throws UnknownHostException,
+			IOException, InterruptedException {
 
-			ps.println("Hello World!!!!");
-			String upper;
-			upper = r.readLine();
-			System.out.println("Recieved " + upper);
-			ps.close();
-			r.close();
-			
-			timeAfter = System.nanoTime();
-			timeTaken = timeAfter-timeBefore;
-			
-			if(shortDelay == 0 || timeTaken < shortDelay)
-			{
-				shortDelay = timeTaken;
-			}
-			
-			if(timeTaken > longDelay)
-			{
-				longDelay = timeTaken;
-			}
-			
-			averageDelay += timeTaken;
-			
+		Socket cs;
+		ctArray = new ClientThread[THREAD_COUNT];
 
+		long timeBefore = System.nanoTime();
+
+		for (int i = 0; i < THREAD_COUNT; i++) {
+			cs = new Socket("localhost", PORT);
+			ctArray[i] = new ClientThread(cs);
+			ctArray[i].start();
 		}
 
-		averageDelay = averageDelay/SAMPLE_SIZE;
-		
-		System.out.println("Shortest time to serve request:" + shortDelay + " ns");
-		System.out.println("Longest time to serve request:" + longDelay + " ns");
-		System.out.println("Average time to serve request:" + averageDelay + " ns");
-		
-		
-	
+		for (int i = 0; i < THREAD_COUNT; i++) {
+			ctArray[i].join();
+		}
+
+		long timeAfter = System.nanoTime();
+		long timeTaken = timeAfter - timeBefore;
+
+		long averageTime = timeTaken / (THREAD_COUNT * SAMPLE_SIZE);
+
+		System.out.println("Total time taken:" + timeTaken + " ns");
+		System.out.println("Average time to serve request:" + averageTime
+				+ " ns");
+
 	}
 
 }
