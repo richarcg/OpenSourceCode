@@ -77,13 +77,10 @@ public class BBServerThread extends Thread {
 					if(srcAccount == null || destAccount == null)
 					{
 						ps.print("Invalid Account number\n");
-					} else if (srcAccount.getBalance() < amount)
-					{
-						ps.print("Insufficient funds\n");
-					} else{
+					}else{
 						
 						//begins thread-safe transfer of funds.
-						transfer(srcAccount, destAccount, amount);
+						transfer(srcAccount, destAccount, amount, ps);
 						
 						ps.print(amount + " transferred from account " + source +
 								" to account " + dest + "\n");
@@ -107,7 +104,7 @@ public class BBServerThread extends Thread {
 	 * @param dest - account money is being deposited in
 	 * @param amount - amount of money being transfered
 	 */
-	public static void transfer(Account src, Account dest, int amount){
+	public static void transfer(Account src, Account dest, int amount, PrintStream ps){
 		ReentrantLock l1; 
 		ReentrantLock l2; 
 		
@@ -122,7 +119,13 @@ public class BBServerThread extends Thread {
 		l1.lock();
 		l2.lock();
 		try {
+			if(src.getBalance() < amount)
+			{
+				ps.print("Insufficient funds\n");
+			} else
+			{
 			src.transferTo(amount, dest);
+			}
 		} finally {
 			l1.unlock();
 			l2.unlock();
