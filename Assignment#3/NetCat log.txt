@@ -1,0 +1,61 @@
+Name: Caleb Richard
+vunetid: richarcg
+
+
+The following document shows the common functionalities of the Message server as utilized through Netcat.
+
+
+This log shows a user registering, joining a chat room, sending a message, then getting a reply. Notice that the message repeats
+every 10 seconds until the client acknowledges the request.
+
+Caleb Richard@226-PC ~
+$ nc -u localhost 20000
+NAME bob
++SUCCESS: WELCOME bob. Your id is 194
+JOIN chat
++SUCCESS: JOINED chat
+MSG chat hey guys!
++SUCCESS: SENT hey guys! TO chat
+POLL
+chat ; Karl : Hi there bob!
+chat ; Karl : Hi there bob!
+chat ; Karl : Hi there bob!
+ACK chat ; Karl : Hi there bob!
+
+This is bob's friend Karl's log. Notice Karl immediately acknowledged the message, so it was not repeated.
+
+Caleb Richard@226-PC ~
+$ nc -u localhost 20000
+NAME Karl
++SUCCESS: WELCOME Karl. Your id is 267
+JOIN chat
++SUCCESS: JOINED chat
+POLL
+chat ; bob : hey guys!
+ACK chat ; bob : hey guys!
+MSG chat Hi there bob!
++SUCCESS: SENT Hi there bob! TO chat
+
+
+Finally, this log shows the some of the non-chat functions of the Message Server.
+Notice that Sue can leave a group she has joined. Also, by giving her original id to the server,
+Sue can change IP address and not lose any of her messages. Finally, Sue Quits and shuts the server down.
+
+Caleb Richard@226-PC ~
+$ nc -u localhost 20000
+NAME Sue
++SUCCESS: WELCOME Sue. Your id is 677
+JOIN lounge
++SUCCESS: JOINED lounge
+LEAVE lounge
++SUCCESS: LEFT lounge
+CHANGEIP 677
++SUCCESS: IP and Port changed
+QUIT
++SUCCESS: Unregistered
+SHUTDOWN
+
+
+
+
+
